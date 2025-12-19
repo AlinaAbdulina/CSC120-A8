@@ -3,122 +3,149 @@ import java.util.Hashtable;
 
 public class Library extends Building implements LibraryRequirements {
 
-  // Attributes 
   private Hashtable<String, Boolean> collection;
-  private boolean hasElevator;
 
-    public Library(String name, String address, int nFloors, boolean hasElevator) {
-      super(name, address, nFloors);
-      this.collection = new Hashtable<>();
-      this.hasElevator = hasElevator;
-      System.out.println("You have built a library: 📖");
-    }
-
-    // Overload, library has an elevator
-    public Library(String name, String address, int nFloors) {
-        this(name, address, nFloors, true);
-    }
-
-    // Methods 
-    // *update collection every time we add/remove a title
-    public void addTitle(String title){
-      collection.put(title, true);
-    }
-
-    // *update every time we remove a book
-    public String removeTitle(String title){
-      // check if title exists 
-      if (!collection.containsKey(title)) {
-        throw new RuntimeException("Not found in the collection.");
-      }
-
-      // remove book 
-      collection.remove(title);
-      return title;
-    } 
-  
-    // *check a book out
-    public void checkOut(String title) {
-      // check if it's in collection
-      if (!collection.containsKey(title)) {
-        throw new RuntimeException("Not found in the collection.");
-      }
-
-        // checking out a book
-        collection.put(title, false);
-        System.out.println("Checked out!");
-    }
-    
-    // // Overload, check out multiple books 
-    // public void checkOut(String title) {
-    //     for (String title : title) {
-    //         checkOut(title);
-    //     }
-    // }
-
-
-
-    // *return a book 
-    public void returnBook(String title) {
-      // check if book is in the collection
-      if (!collection.containsKey(title)) {
-        throw new RuntimeException("Not found in the collection.");
-      }
-
-      // return book back to collection
-      collection.put(title, true);
-      System.out.println("Returned");
-    }
-
-
-    // *returns true if the title appears as a key in the Libary's collection, false otherwise
-    public boolean containsTitle(String title){
-      return collection.containsKey(title);
-    }
-
-    // *returns true if the title is currently available, false otherwise
-    public boolean isAvailable(String title){
-      return collection.containsKey(title);
-
-    }
-
-    // *prints out the entire collection in an easy-to-read way (including checkout status) 
-    public void printCollection() {
-      System.out.println("Library Collection:");
-      for (String title : collection.keySet()) {
-        if (collection.get(title)) {
-          System.out.println(title + " Available");
-        } else {
-          System.out.println(title + " Checked Out");
-        }
-      }
-    }
-
-
-
-  // Override - show library-specific options 
-    @Override
-    public void showOptions() {
-        super.showOptions();
-        System.out.println(" + addTitle(title) \n + removeTitle(title) \n + checkOut(title) \n + returnBook(title) \n + printCollection()");
-    }
-
-
-  // Override - libraries with elevators can jump floors */
-  @Override
-  public void goToFloor(int floorNum) {
-      super.goToFloor(floorNum);
-
-  // need to add the elevator 
-      
+  /**
+   * Construct a Library
+   * @param name library name
+   * @param address library address
+   * @param nFloors number of floors
+   */
+  public Library(String name, String address, int nFloors) {
+    super(name, address, nFloors);
+    this.collection = new Hashtable<String, Boolean>();
+    System.out.println("You have built a library: 📖");
   }
 
+  /**
+   * Overloaded constructor - default to 2 floors
+   * @param name library name
+   * @param address library address
+   */
+  public Library(String name, String address) {
+    this(name, address, 2);
+  }
 
+  /** 
+   * Add a title to the collection 
+   * @param title title to add
+   */
+  public void addTitle(String title){
+    this.collection.put(title, true);
+  }
 
-    public static void main(String[] args) {
-      Library neilson = new Library("Neilson Library", "7 Neilson Drive, Northampton, MA", 4, true);
-      // not done yet
+  /**
+   * Overloaded addTitle - add multiple titles at once
+   * @param titles array of titles to add
+   */
+  public void addTitle(String[] titles) {
+    for (String title : titles) {
+      addTitle(title);
     }
+  }
 
+  /**
+   * Remove a title from the collection and return it back
+   * @param title title to remove
+   * @return the removed title
+   */
+  public String removeTitle(String title) { 
+    if (this.collection.containsKey(title)) {
+      this.collection.remove(title);
+      return title;
+    }
+    return null;
+  }
+  
+  /** 
+   * Check out a title
+   * @param title title to check out
+   */
+  public void checkOut(String title) {
+    if (this.collection.containsKey(title)) {
+      this.collection.replace(title, false);
+    }
+  }
+    
+  /** 
+   * Return a book
+   * @param title title to return
+   */
+  public void returnBook(String title) {
+    if (this.collection.containsKey(title)) {
+      this.collection.replace(title, true);
+    }
+  }
+
+  /**
+   * Check whether the collection contains the title
+   * @param title title to check
+   * @return true if present
+   */
+  public boolean containsTitle(String title){
+    return this.collection.containsKey(title);
+  }
+
+  /**
+   * Check whether a title is available
+   * @param title title to check
+   * @return availability status
+   */
+  public boolean isAvailable(String title) {
+    if (this.collection.containsKey(title)) {
+      return this.collection.get(title);
+    }
+    return false;
+  }
+  
+  /** 
+   * Print the full collection
+   */
+  public void printCollection() {
+    System.out.println("Library Collection:");
+    for (String title : this.collection.keySet()) {
+      boolean isAvailable = this.collection.get(title);
+      String status;
+      if (isAvailable) {
+        status = "Available";
+      } else {
+        status = "Checked Out";
+      }
+      
+      System.out.println("- " + title + ": " + status);
+    }
+  }
+
+  /**
+   * Override showOptions to include Library-specific methods
+   */
+  @Override
+  public void showOptions() {
+    super.showOptions();
+    System.out.println(" + addTitle(String)\n + removeTitle(String)\n + checkOut(String)\n + returnBook(String)\n + containsTitle(String)\n + isAvailable(String)\n + printCollection()");
+  }
+
+  /**
+   * Override goToFloor - libraries have elevators, so can move to any floor
+   * @param floorNum floor to go to
+   */
+  @Override
+  public void goToFloor(int floorNum) {
+    if (this.activeFloor == -1) {
+      throw new RuntimeException("You are not inside this Building. Must call enter() before navigating between floors.");
+    }
+    if (floorNum < 1 || floorNum > this.nFloors) {
+      throw new RuntimeException("Invalid floor number. Valid range for this Building is 1-" + this.nFloors + ".");
+    }
+    System.out.println("You are now on floor #" + floorNum + " of " + this.name);
+    this.activeFloor = floorNum;
+  }
+
+  public static void main(String[] args) {
+    Library myLibrary = new Library("Neilson Library", "7 Neilson Drive", 4);
+    myLibrary.addTitle("The Great Gatsby");
+    myLibrary.printCollection();
+    myLibrary.checkOut("The Great Gatsby");
+    myLibrary.printCollection();
+  }
 }
-
